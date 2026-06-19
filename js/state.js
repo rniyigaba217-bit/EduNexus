@@ -1,0 +1,213 @@
+/**
+ * EduNexus — state.js
+ * Central data model. All views read from and write to State.*
+ * In production replace mock data with Supabase queries.
+ */
+
+const State = (() => {
+
+  /* ── Current session ─────────────────────────── */
+  let currentRole = 'student';
+  let currentPage = '';
+  let aiHistory   = [];
+  let activeChatRoom = 'cs-general';
+  let anonMode    = false;
+  let modalTimer  = null;
+  let modalSecs   = 5400;
+  let qCount      = 1;
+  let _profile    = null;  // set from Firestore after login
+
+  /* ── Role profiles ───────────────────────────── */
+  const roles = {
+    student:      { name:'Alex Johnson',    role:'Student · CS Dept',    uni:'University of Technology',  avatar:'AJ', color:'#6c63ff' },
+    facilitator:  { name:'Dr. Sarah Williams', role:'Facilitator · CS Dept', uni:'University of Technology', avatar:'SW', color:'#00d4aa' },
+    'uni-admin':  { name:'Prof. Mark Davis',role:'University Admin',      uni:'University of Technology',  avatar:'MD', color:'#ffd166' },
+    'super-admin':{ name:'System Admin',    role:'Super Administrator',   uni:'EduNexus Platform',         avatar:'SA', color:'#ff6b6b' },
+    ministry:     { name:'Dr. Amina Kone',  role:'Ministry of Education', uni:'Ministry Dashboard',        avatar:'AK', color:'#ce93d8' },
+  };
+
+  /* ── Nav config ──────────────────────────────── */
+  const navConfig = {
+    student: [
+      { section:'Learning' },
+      { id:'dashboard',   label:'Dashboard',          icon:'🏠' },
+      { id:'courses',     label:'My Courses',         icon:'📚' },
+      { id:'materials',   label:'Learning Materials', icon:'📄' },
+      { id:'exams',       label:'Exams & Tests',      icon:'📝' },
+      { id:'grades',      label:'My Grades',          icon:'📊' },
+      { section:'Community' },
+      { id:'chat',        label:'Chat Rooms',         icon:'💬' },
+      { id:'reviews',     label:'Reviews',            icon:'⭐' },
+      { section:'AI' },
+      { id:'ai-advisor',  label:'AI Learning Advisor',icon:'🤖' },
+    ],
+    facilitator: [
+      { section:'Teaching' },
+      { id:'dashboard',     label:'Dashboard',          icon:'🏠' },
+      { id:'fac-materials', label:'Learning Materials', icon:'📄' },
+      { id:'exam-create',   label:'Create Exam',        icon:'✏️' },
+      { id:'grade-papers',  label:'Grade Papers',       icon:'📋' },
+      { id:'gradebook',     label:'Gradebook',          icon:'📊' },
+      { section:'Communication' },
+      { id:'chat',          label:'Chat Rooms',         icon:'💬' },
+      { id:'reviews',       label:'Reviews',            icon:'⭐' },
+    ],
+    'uni-admin': [
+      { section:'Administration' },
+      { id:'dashboard',    label:'Dashboard',    icon:'🏠' },
+      { id:'students',     label:'Students',     icon:'👥' },
+      { id:'facilitators', label:'Facilitators', icon:'👨‍🏫' },
+      { id:'departments',  label:'Departments',  icon:'🏛️' },
+      { id:'analytics',    label:'Analytics',    icon:'📈' },
+      { section:'Platform' },
+      { id:'reviews',      label:'Feedback & Reviews', icon:'⭐' },
+      { id:'chat',         label:'Chat Rooms',         icon:'💬' },
+    ],
+    'super-admin': [
+      { section:'Platform' },
+      { id:'dashboard',    label:'Dashboard',          icon:'🏠' },
+      { id:'universities', label:'Universities',       icon:'🏫' },
+      { id:'students',     label:'All Students',       icon:'👥' },
+      { id:'analytics',    label:'Platform Analytics', icon:'📈' },
+      { section:'Administration' },
+      { id:'admins',       label:'Admins',             icon:'🔑' },
+      { id:'reviews',      label:'All Feedback',       icon:'⭐' },
+    ],
+    ministry: [
+      { section:'Ministry Overview' },
+      { id:'dashboard',       label:'Overview Dashboard',  icon:'🏠' },
+      { id:'school-analysis', label:'By School',           icon:'🏫' },
+      { id:'dept-analysis',   label:'By Department',       icon:'🏛️' },
+      { id:'course-analysis', label:'By Course',           icon:'📚' },
+      { id:'complaints',      label:'Complaints & Reviews',icon:'📋' },
+      { id:'trends',          label:'National Trends',     icon:'📈' },
+    ],
+  };
+
+  /* ── Chat messages (mock) ────────────────────── */
+  const chatMessages = {
+    'cs-general': [
+      { user:'Sara M.',    text:'Has anyone started the OS assignment?',         anon:false, time:'10:32' },
+      { user:'Anonymous',  text:'Prof said it\'s easier than it looks',          anon:true,  time:'10:35' },
+      { user:'James K.',   text:'I finished it, happy to help in study hall',    anon:false, time:'10:40' },
+    ],
+    'math-201': [
+      { user:'Lena P.',    text:'The calculus notes from week 3 are gold',       anon:false, time:'09:15' },
+      { user:'Anonymous',  text:'Anyone else think the midterm was unfair?',     anon:true,  time:'09:22' },
+    ],
+    'reviews': [
+      { user:'Anonymous',  text:'Prof Williams explains concepts really clearly!',anon:true,  time:'Yesterday' },
+      { user:'Anonymous',  text:'The lab equipment is outdated, needs upgrade',  anon:true,  time:'2 days ago' },
+    ],
+  };
+
+  /* ── Students (mock) ─────────────────────────── */
+  const students = [
+    { name:'Alex Johnson',  id:'CS-0001', dept:'Computer Science', year:3, gpa:83.4, status:'Active' },
+    { name:'Maria Santos',  id:'CS-0041', dept:'Computer Science', year:2, gpa:91.0, status:'Active' },
+    { name:'James Kwame',   id:'CS-0087', dept:'Computer Science', year:4, gpa:78.2, status:'Active' },
+    { name:'Priya Sharma',  id:'CS-0112', dept:'Engineering',      year:2, gpa:87.5, status:'Active' },
+    { name:'Carlos Rivera', id:'CS-0156', dept:'Mathematics',      year:3, gpa:62.1, status:'At Risk' },
+    { name:'Aisha Obi',     id:'CS-0203', dept:'Computer Science', year:1, gpa:93.2, status:'Active' },
+  ];
+
+  /* ── Courses (mock) ──────────────────────────── */
+  const courses = [
+    { code:'CS301', name:'Data Structures',      prof:'Dr. Williams', credits:3, grade:88 },
+    { code:'CS302', name:'Algorithms',           prof:'Prof. Ahmed',  credits:3, grade:76 },
+    { code:'CS303', name:'Operating Systems',    prof:'Dr. Patel',    credits:4, grade:91 },
+    { code:'CS304', name:'Database Systems',     prof:'Dr. Kim',      credits:3, grade:70 },
+    { code:'CS305', name:'Computer Networks',    prof:'Prof. Johnson',credits:3, grade:82 },
+    { code:'CS306', name:'Software Engineering', prof:'Dr. Chen',     credits:4, grade:85 },
+  ];
+
+  /* ── Materials (mock) ────────────────────────── */
+  const materials = [
+    { icon:'📄', name:'Week 1 – Introduction to Data Structures', type:'PDF',   size:'2.4 MB', date:'Jan 12', week:'Week 1', course:'CS301' },
+    { icon:'🎥', name:'Lecture: Arrays and Linked Lists (Video)',  type:'Video', size:'180 MB', date:'Jan 14', week:'Week 1', course:'CS301' },
+    { icon:'📄', name:'Week 2 – Stacks and Queues Notes',         type:'PDF',   size:'1.8 MB', date:'Jan 19', week:'Week 2', course:'CS301' },
+    { icon:'🔗', name:'Practice Problems – Recursion (External)', type:'Link',  size:'—',      date:'Jan 21', week:'Week 2', course:'CS301' },
+    { icon:'📑', name:'Week 3 – Trees & Binary Search Trees',     type:'Slides',size:'5.1 MB', date:'Jan 26', week:'Week 3', course:'CS301' },
+    { icon:'📄', name:'Week 4 – Graphs & Traversal Algorithms',   type:'PDF',   size:'3.2 MB', date:'Feb 2',  week:'Week 4', course:'CS302' },
+    { icon:'🎥', name:'Lecture: Dijkstra\'s Algorithm',           type:'Video', size:'220 MB', date:'Feb 4',  week:'Week 4', course:'CS302' },
+  ];
+
+  /* ── Notifications (mock) ────────────────────── */
+  const notifications = [
+    { id:1, title:'New exam scheduled',  sub:'Data Structures – Monday 9am', read:false, time:'1h ago' },
+    { id:2, title:'Grade posted',        sub:'Algorithms midterm: 87/100',   read:false, time:'2h ago' },
+    { id:3, title:'AI Tip available',    sub:'New personalized recommendation', read:false, time:'3h ago' },
+    { id:4, title:'Chat message',        sub:'#cs-general: "Anyone done the assignment?"', read:true, time:'4h ago' },
+  ];
+
+  /* ── Written papers pending grading ─────────── */
+  const pendingPapers = [
+    { name:'Maria Santos',  id:'2021-CS-0041', answer:'DFS uses a stack and explores as deep as possible before backtracking. BFS uses a queue and explores level by level. I would use DFS for maze solving and BFS for finding the shortest path in unweighted graphs.' },
+    { name:'James Kwame',   id:'2021-CS-0087', answer:'Depth-first search goes down one path completely before trying others. BFS explores level by level. DFS is better for games like chess; BFS for shortest routes like GPS navigation.' },
+    { name:'Priya Sharma',  id:'2021-CS-0112', answer:'DFS and BFS are both graph traversal algorithms. DFS goes deep using recursion or a stack. BFS uses a queue for level-order traversal. BFS guarantees shortest path in unweighted graphs.' },
+  ];
+
+  /* ── Universities ────────────────────────────── */
+  const universities = [
+    { name:'University of Technology',   students:4821, facilitators:183, depts:12, avg:'82%', status:'Active', admin:'Prof. Davis' },
+    { name:'State Medical University',   students:2140, facilitators:98,  depts:8,  avg:'88%', status:'Active', admin:'Dr. Amara' },
+    { name:'National Engineering Univ.', students:3210, facilitators:142, depts:10, avg:'79%', status:'Active', admin:'Prof. Smith' },
+    { name:'Arts & Sciences University', students:1840, facilitators:76,  depts:7,  avg:'71%', status:'Active', admin:'Dr. Reyes' },
+    { name:'Business School',            students:2410, facilitators:104, depts:5,  avg:'80%', status:'Active', admin:'Prof. Tanaka' },
+    { name:'Southern Polytechnic',       students:1620, facilitators:88,  depts:6,  avg:'68%', status:'Active', admin:'Dr. Mensah' },
+  ];
+
+  /* ── Exam question types ─────────────────────── */
+  const questionTypes = [
+    { value:'mcq',     label:'Multiple Choice' },
+    { value:'written', label:'Written / Essay' },
+    { value:'code',    label:'Code' },
+    { value:'tf',      label:'True / False' },
+    { value:'fill',    label:'Fill in the Blank' },
+    { value:'match',   label:'Matching' },
+  ];
+
+  /* ── Public API ──────────────────────────────── */
+  return {
+    get currentRole()     { return currentRole; },
+    set currentRole(v)    { currentRole = v; },
+    get currentPage()     { return currentPage; },
+    set currentPage(v)    { currentPage = v; },
+    get aiHistory()       { return aiHistory; },
+    set aiHistory(v)      { aiHistory = v; },
+    get activeChatRoom()  { return activeChatRoom; },
+    set activeChatRoom(v) { activeChatRoom = v; },
+    get anonMode()        { return anonMode; },
+    set anonMode(v)       { anonMode = v; },
+    get modalTimer()      { return modalTimer; },
+    set modalTimer(v)     { modalTimer = v; },
+    get modalSecs()       { return modalSecs; },
+    set modalSecs(v)      { modalSecs = v; },
+    get qCount()          { return qCount; },
+    set qCount(v)         { qCount = v; },
+
+    roles,
+    navConfig,
+    chatMessages,
+    students,
+    courses,
+    materials,
+    notifications,
+    pendingPapers,
+    universities,
+    questionTypes,
+
+    /* helpers */
+    currentUser()    { return _profile || roles[currentRole]; },
+    setProfile(p)    { _profile = p; currentRole = p.role; },
+    clearProfile()   { _profile = null; },
+    addNotification(title, sub) {
+      notifications.unshift({ id: Date.now(), title, sub, read: false, time: 'Just now' });
+    },
+    addMaterial(mat) { materials.unshift(mat); },
+    addChatMessage(room, msg) {
+      if (!chatMessages[room]) chatMessages[room] = [];
+      chatMessages[room].push(msg);
+    },
+  };
+})();

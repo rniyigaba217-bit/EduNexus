@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduNexus – University Learning Platform</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <!-- EmailJS -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════
+       LOGIN SCREEN
+  ════════════════════════════════════════ -->
+  <div id="login-screen">
+    <div class="login-box">
+      <div class="logo">
+        <h1>EduNexus</h1>
+        <p>Connected University Learning Platform</p>
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="login-email" placeholder="you@university.edu" autocomplete="email"
+               onkeydown="if(event.key==='Enter')document.getElementById('login-password').focus()" />
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password"
+               onkeydown="if(event.key==='Enter')Auth.login()" />
+      </div>
+      <div id="login-error" style="display:none;color:var(--red);font-size:.84rem;margin-bottom:10px;padding:10px 12px;background:rgba(255,107,107,.1);border-radius:8px;border:1px solid rgba(255,107,107,.3)"></div>
+      <button class="btn" id="login-btn" onclick="Auth.login()">Sign In</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       APP SHELL
+  ════════════════════════════════════════ -->
+  <div id="app">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <h2>EduNexus</h2>
+        <span id="uni-name-label">University of Technology</span>
+      </div>
+      <nav class="sidebar-nav" id="sidebar-nav"></nav>
+      <div class="sidebar-user">
+        <div class="user-card">
+          <div class="avatar" id="sidebar-avatar">S</div>
+          <div class="user-info">
+            <div class="user-name" id="sidebar-uname">Alex Johnson</div>
+            <div class="user-role" id="sidebar-urole">Student · CS Dept</div>
+          </div>
+          <button class="logout-btn" onclick="Auth.logout()" title="Logout">⏻</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+      <div class="topbar">
+        <h2 id="page-title">Dashboard</h2>
+        <div class="topbar-right">
+          <div class="notif-btn" onclick="Notifications.toggle()" style="position:relative">
+            🔔 <div class="badge" id="notif-badge">3</div>
+          </div>
+          <div style="font-size:.82rem;color:var(--text2)" id="topbar-role-label">Student</div>
+        </div>
+      </div>
+      <div class="content" id="main-content"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       MODAL
+  ════════════════════════════════════════ -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal" id="modal-box">
+      <div class="modal-header">
+        <div class="modal-title" id="modal-title">Modal</div>
+        <button class="modal-close" onclick="Utils.closeModal()">✕</button>
+      </div>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       NOTIFICATION PANEL
+  ════════════════════════════════════════ -->
+  <div class="notif-panel" id="notif-panel">
+    <div class="notif-head">
+      <span>Notifications</span>
+      <button onclick="Notifications.clearAll()" style="background:none;border:none;color:var(--text2);font-size:.78rem;cursor:pointer">Clear all</button>
+    </div>
+    <div id="notif-list"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       SCRIPTS — ORDER MATTERS
+  ════════════════════════════════════════ -->
+  <!-- Core -->
+  <script src="js/db.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/notifications.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/nav.js"></script>
+  <script src="js/app.js"></script>
+
+  <!-- Components -->
+  <script src="components/file-upload.js"></script>
+  <script src="components/chat.js"></script>
+  <script src="components/reviews.js"></script>
+
+  <!-- Student Views -->
+  <script src="views/student/dashboard.js"></script>
+  <script src="views/student/courses.js"></script>
+  <script src="views/student/materials.js"></script>
+  <script src="views/student/exams.js"></script>
+  <script src="views/student/grades.js"></script>
+  <script src="views/student/ai-advisor.js"></script>
+
+  <!-- Facilitator Views -->
+  <script src="views/facilitator/dashboard.js"></script>
+  <script src="views/facilitator/materials.js"></script>
+  <script src="views/facilitator/exam-create.js"></script>
+  <script src="views/facilitator/grade-papers.js"></script>
+  <script src="views/facilitator/gradebook.js"></script>
+
+  <!-- Admin Views -->
+  <script src="views/admin/dashboard.js"></script>
+  <script src="views/admin/students.js"></script>
+  <script src="views/admin/facilitators.js"></script>
+  <script src="views/admin/departments.js"></script>
+  <script src="views/admin/analytics.js"></script>
+
+  <!-- Super Admin Views -->
+  <script src="views/super-admin/dashboard.js"></script>
+  <script src="views/super-admin/universities.js"></script>
+  <script src="views/super-admin/admins.js"></script>
+
+  <!-- Ministry Views -->
+  <script src="views/ministry/dashboard.js"></script>
+  <script src="views/ministry/school-analysis.js"></script>
+  <script src="views/ministry/dept-analysis.js"></script>
+  <script src="views/ministry/course-analysis.js"></script>
+  <script src="views/ministry/complaints.js"></script>
+  <script src="views/ministry/trends.js"></script>
+
+</body>
+</html>
