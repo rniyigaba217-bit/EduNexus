@@ -27,9 +27,10 @@ function _ministryDash(c) {
 
 App.register('dashboard', c => {
   const role = State.currentRole;
-  if      (role === 'student')     _studentDash(c);
-  else if (role === 'facilitator') _facilDash(c);
-  else if (role === 'uni-admin')   _uniAdminDash(c);
-  else if (role === 'super-admin') _superDash(c);
-  else if (role === 'ministry')    _ministryDash(c);
+  if      (role === 'student')          _studentDash(c);
+  else if (role === 'facilitator')      _facilDash(c);
+  else if (role === 'uni-admin')        _uniAdminDash(c);
+  else if (role === 'super-admin')      _superDash(c);
+  else if (role === 'ministry')         _ministryDash(c);
+  else if (role === 'school-director')  _schoolDirectorDash(c);
 });

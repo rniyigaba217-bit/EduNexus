@@ -61,6 +61,15 @@ const DB = (() => {
         email:'ministry@edunexus.dev',
       },
     },
+    {
+      email:        'director@edunexus.dev',
+      passwordHash: '93089ea4a753442f02b01ed8b8f1bc34c978c7641e32ec88ac19812e000c8a19',
+      profile: {
+        name:'Dr. Fatima Osei', role:'school-director', roleLabel:'School Director',
+        uni:'University of Technology', avatar:'FO', color:'#38bdf8',
+        email:'director@edunexus.dev',
+      },
+    },
   ];
 
   // ── localStorage helpers ────────────────────────────────

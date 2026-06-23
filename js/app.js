@@ -11,6 +11,9 @@ const App = (() => {
     'school-analysis':'Performance by School', 'dept-analysis':'Performance by Department',
     'course-analysis':'Performance by Course', complaints:'Complaints & Reviews',
     trends:'National Trends',
+    'sd-departments':'Departments', 'sd-staff':'Staff & Facilitators',
+    'sd-students':'Students', 'sd-reviews':'Reviews & Feedback',
+    'sd-reports':'Performance Reports',
   };
 
   const views = {};

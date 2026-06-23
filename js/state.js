@@ -23,7 +23,8 @@ const State = (() => {
     facilitator:  { name:'Dr. Sarah Williams', role:'Facilitator · CS Dept', uni:'University of Technology', avatar:'SW', color:'#00d4aa' },
     'uni-admin':  { name:'Prof. Mark Davis',role:'University Admin',      uni:'University of Technology',  avatar:'MD', color:'#ffd166' },
     'super-admin':{ name:'System Admin',    role:'Super Administrator',   uni:'EduNexus Platform',         avatar:'SA', color:'#ff6b6b' },
-    ministry:     { name:'Dr. Amina Kone',  role:'Ministry of Education', uni:'Ministry Dashboard',        avatar:'AK', color:'#ce93d8' },
+    ministry:          { name:'Dr. Amina Kone',  role:'Ministry of Education', uni:'Ministry Dashboard',        avatar:'AK', color:'#ce93d8' },
+    'school-director': { name:'Dr. Fatima Osei', role:'School Director',        uni:'University of Technology',  avatar:'FO', color:'#38bdf8' },
   };
 
   /* ── Nav config ──────────────────────────────── */
@@ -82,10 +83,33 @@ const State = (() => {
       { id:'complaints',      label:'Complaints & Reviews',icon:'📋' },
       { id:'trends',          label:'National Trends',     icon:'📈' },
     ],
+    'school-director': [
+      { section:'School Overview' },
+      { id:'dashboard',      label:'Dashboard',              icon:'🏠' },
+      { id:'sd-departments', label:'Departments',            icon:'🏛️' },
+      { id:'sd-staff',       label:'Staff & Facilitators',   icon:'👨‍🏫' },
+      { id:'sd-students',    label:'Students',               icon:'👥' },
+      { section:'Insights' },
+      { id:'sd-reviews',     label:'Reviews & Feedback',     icon:'⭐' },
+      { id:'sd-reports',     label:'Performance Reports',    icon:'📊' },
+      { section:'Communication' },
+      { id:'chat',           label:'Chat Rooms',             icon:'💬' },
+    ],
   };
 
   /* ── Chat messages (mock) ────────────────────── */
   const chatMessages = {
+    'directors': [
+      { user:'Dr. Fatima Osei',  text:'Arts dept pass rate is a concern this term — anyone else seeing similar patterns?', anon:false, time:'09:10' },
+      { user:'Dr. Mensah',       text:'Same here with Southern Polytech. We\'re trialling peer-tutoring sessions next week.', anon:false, time:'09:18' },
+      { user:'Prof. Tanaka',     text:'Business School has had good results pairing at-risk students with senior mentors.', anon:false, time:'09:25' },
+      { user:'Dr. Fatima Osei',  text:'Worth a pilot. I\'ll raise it in the ministry review on Friday.', anon:false, time:'09:31' },
+    ],
+    'admin-channel': [
+      { user:'Prof. Mark Davis', text:'Timetables for Term 3 are being finalised — please send dept conflicts by Thursday.', anon:false, time:'08:00' },
+      { user:'Dr. Fatima Osei',  text:'Engineering has a lab clash on Tuesday mornings. Will send details.', anon:false, time:'08:15' },
+      { user:'Prof. Mark Davis', text:'Noted, I\'ll flag it to the timetable office.', anon:false, time:'08:20' },
+    ],
     'cs-general': [
       { user:'Sara M.',    text:'Has anyone started the OS assignment?',         anon:false, time:'10:32' },
       { user:'Anonymous',  text:'Prof said it\'s easier than it looks',          anon:true,  time:'10:35' },
@@ -157,6 +181,45 @@ const State = (() => {
     { name:'Southern Polytechnic',       students:1620, facilitators:88,  depts:6,  avg:'68%', status:'Active', admin:'Dr. Mensah' },
   ];
 
+  /* ── School Director data (mock) ────────────── */
+  const sdDepartments = [
+    { name:'Computer Science', students:1240, staff:28, passRate:82, trend:'+2.1%', status:'Active' },
+    { name:'Engineering',      students:980,  staff:24, passRate:78, trend:'+0.8%', status:'Active' },
+    { name:'Mathematics',      students:720,  staff:18, passRate:74, trend:'-1.2%', status:'Watch'  },
+    { name:'Business Studies', students:860,  staff:22, passRate:80, trend:'+1.5%', status:'Active' },
+    { name:'Medicine',         students:540,  staff:19, passRate:88, trend:'+3.0%', status:'Active' },
+    { name:'Arts & Humanities',students:481,  staff:16, passRate:71, trend:'-2.8%', status:'At Risk'},
+  ];
+
+  const sdStaff = [
+    { name:'Dr. Sarah Williams',  dept:'Computer Science', students:247, courses:4, satisfaction:88, status:'Active'   },
+    { name:'Prof. Ahmed Hassan',  dept:'Computer Science', students:180, courses:3, satisfaction:79, status:'Active'   },
+    { name:'Dr. Anjali Patel',    dept:'Engineering',      students:165, courses:3, satisfaction:85, status:'Active'   },
+    { name:'Prof. James Chen',    dept:'Engineering',      students:192, courses:4, satisfaction:77, status:'Active'   },
+    { name:'Dr. Linh Nguyen',     dept:'Mathematics',      students:143, courses:3, satisfaction:82, status:'Active'   },
+    { name:'Prof. Kwame Asante',  dept:'Business Studies', students:128, courses:2, satisfaction:74, status:'Review'   },
+    { name:'Dr. Yemi Adeyemo',    dept:'Medicine',         students:98,  courses:2, satisfaction:91, status:'Active'   },
+    { name:'Prof. Rita Okafor',   dept:'Arts & Humanities',students:112, courses:3, satisfaction:69, status:'At Risk'  },
+  ];
+
+  const sdReviewThemes = [
+    { theme:'Teaching Quality',       count:342, sentiment:'mixed',    trend:'↑', pct:28 },
+    { theme:'Course Content',         count:289, sentiment:'positive', trend:'→', pct:24 },
+    { theme:'Facilities & Equipment', count:215, sentiment:'negative', trend:'↑', pct:18 },
+    { theme:'Exam Difficulty',        count:187, sentiment:'negative', trend:'↓', pct:15 },
+    { theme:'Admin Support',          count:134, sentiment:'negative', trend:'↑', pct:11 },
+    { theme:'Platform Usability',     count:52,  sentiment:'positive', trend:'↓', pct:4  },
+  ];
+
+  const sdRecentReviews = [
+    { stars:5, text:'Prof. Williams explains complex topics with great clarity. Best lecturer I\'ve had so far.', dept:'Computer Science', time:'2h ago' },
+    { stars:2, text:'Lab equipment in Block C needs urgent maintenance. Our experiments were delayed twice this week.', dept:'Engineering', time:'5h ago' },
+    { stars:3, text:'Course materials are well-organised but the reading list really needs updating to 2024 editions.', dept:'Mathematics', time:'Yesterday' },
+    { stars:2, text:'Admin office response time is far too slow — took 3 weeks to resolve my academic query.', dept:'General', time:'2 days ago' },
+    { stars:4, text:'The AI learning advisor is genuinely helpful for exam preparation. Keep it going!', dept:'Computer Science', time:'2 days ago' },
+    { stars:1, text:'Arts department classrooms are overcrowded and the projectors are broken half the time.', dept:'Arts & Humanities', time:'3 days ago' },
+  ];
+
   /* ── Exam question types ─────────────────────── */
   const questionTypes = [
     { value:'mcq',     label:'Multiple Choice' },
@@ -196,6 +259,10 @@ const State = (() => {
     pendingPapers,
     universities,
     questionTypes,
+    sdDepartments,
+    sdStaff,
+    sdReviewThemes,
+    sdRecentReviews,
 
     /* helpers */
     currentUser()    { return _profile || roles[currentRole]; },

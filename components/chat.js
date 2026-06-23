@@ -1,13 +1,51 @@
 const Chat = (() => {
 
-  const rooms = [
-    { id:'cs-general', name:'#cs-general',          icon:'💬', preview:'I finished it, happy to help' },
-    { id:'math-201',   name:'#math-201',             icon:'📐', preview:'The calculus notes are gold'  },
-    { id:'net-305',    name:'#networks-305',         icon:'🌐', preview:'Anyone understand subnetting?' },
-    { id:'reviews',    name:'🔒 Anonymous Reviews',  icon:'⭐', preview:'Anonymous review forum'       },
-  ];
+  const roomsByRole = {
+    student:          [
+      { id:'cs-general', name:'#cs-general',         icon:'💬', preview:'I finished it, happy to help' },
+      { id:'math-201',   name:'#math-201',            icon:'📐', preview:'The calculus notes are gold'  },
+      { id:'net-305',    name:'#networks-305',        icon:'🌐', preview:'Anyone understand subnetting?'},
+      { id:'reviews',    name:'🔒 Anonymous Reviews', icon:'⭐', preview:'Anonymous review forum'       },
+    ],
+    facilitator:      [
+      { id:'cs-general', name:'#cs-general',         icon:'💬', preview:'I finished it, happy to help' },
+      { id:'math-201',   name:'#math-201',            icon:'📐', preview:'The calculus notes are gold'  },
+      { id:'reviews',    name:'🔒 Anonymous Reviews', icon:'⭐', preview:'Anonymous review forum'       },
+    ],
+    'uni-admin':      [
+      { id:'admin-channel', name:'#admin-channel',   icon:'🔑', preview:'Timetables for Term 3…'       },
+      { id:'cs-general',    name:'#cs-general',      icon:'💬', preview:'I finished it, happy to help' },
+      { id:'reviews',       name:'🔒 Anonymous Reviews', icon:'⭐', preview:'Anonymous review forum'    },
+    ],
+    'super-admin':    [
+      { id:'admin-channel', name:'#admin-channel',   icon:'🔑', preview:'Timetables for Term 3…'       },
+      { id:'directors',     name:'#directors',       icon:'🏫', preview:'Arts dept pass rate…'         },
+      { id:'reviews',       name:'🔒 Anonymous Reviews', icon:'⭐', preview:'Anonymous review forum'    },
+    ],
+    ministry:         [
+      { id:'directors',     name:'#directors',       icon:'🏫', preview:'Arts dept pass rate…'         },
+      { id:'admin-channel', name:'#admin-channel',   icon:'🔑', preview:'Timetables for Term 3…'       },
+      { id:'reviews',       name:'🔒 Anonymous Reviews', icon:'⭐', preview:'Anonymous review forum'    },
+    ],
+    'school-director': [
+      { id:'directors',     name:'#directors',       icon:'🏫', preview:'Arts dept pass rate…'         },
+      { id:'admin-channel', name:'#admin-channel',   icon:'🔑', preview:'Timetables for Term 3…'       },
+      { id:'reviews',       name:'🔒 Anonymous Reviews', icon:'⭐', preview:'Anonymous review forum'    },
+    ],
+  };
+
+  function _rooms() {
+    return roomsByRole[State.currentRole] || roomsByRole.student;
+  }
+
+  function _ensureActiveRoom() {
+    const ids = _rooms().map(r => r.id);
+    if (!ids.includes(State.activeChatRoom)) State.activeChatRoom = ids[0];
+  }
 
   function render(c) {
+    _ensureActiveRoom();
+    const rooms = _rooms();
     c.innerHTML = `
     <div class="chat-layout">
       <div class="chat-sidebar">
