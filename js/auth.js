@@ -40,7 +40,11 @@ const Auth = (() => {
 
       // Same timing whether email exists or not — prevents user enumeration
       if (!user || hash !== user.passwordHash) {
-        _recordFailure();
+        const count = _recordFailure();
+        SysLog.write('login_fail',
+          `${email} — failed attempt ${count}/${MAX_ATTEMPTS}${count >= MAX_ATTEMPTS ? ' — account locked' : ''}`,
+          count >= MAX_ATTEMPTS ? 'error' : 'warning'
+        );
         _setLoading(false);
         _showError('Incorrect email or password.');
         return;
@@ -48,6 +52,7 @@ const Auth = (() => {
 
       // Success — clear failures, save session
       localStorage.removeItem(ATTEMPTS_KEY);
+      SysLog.write('login_success', `${email} logged in`, 'info');
       localStorage.setItem(SESSION_KEY, JSON.stringify(user.profile));
       _mountApp(user.profile);
 
@@ -81,6 +86,9 @@ const Auth = (() => {
     document.getElementById('topbar-role-label').textContent = profile.roleLabel.split(' · ')[0];
 
     Nav.build();
+    Notifier.loadForUser(profile.email || '', profile.role, profile.name);
+    Notifier.checkDeadlines();
+    Notifications.refresh();
     App.navigate('dashboard');
   }
 
@@ -108,6 +116,7 @@ const Auth = (() => {
     data.count  += 1;
     data.lastAt  = Date.now();
     localStorage.setItem(ATTEMPTS_KEY, JSON.stringify(data));
+    return data.count;
   }
 
   function _showError(msg) {
@@ -125,5 +134,14 @@ const Auth = (() => {
     if (btn) { btn.disabled = on; btn.textContent = on ? 'Signing in…' : 'Sign In'; }
   }
 
-  return { login, logout };
+  function demoLogin(role) {
+    const profile = DB.demoProfile(role);
+    if (!profile) return;
+    _clearError();
+    SysLog.write('login_success', `Demo login as ${role}`, 'info');
+    localStorage.setItem(SESSION_KEY, JSON.stringify(profile));
+    _mountApp(profile);
+  }
+
+  return { login, logout, demoLogin };
 })();

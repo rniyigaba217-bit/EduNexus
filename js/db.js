@@ -139,5 +139,9 @@ const DB = (() => {
     _saveExtra(extra);
   }
 
-  return { findByEmail, getAllByRole, createUser, generatePassword };
+  function demoProfile(role) {
+    return _seed.find(u => u.profile.role === role)?.profile || null;
+  }
+
+  return { findByEmail, getAllByRole, createUser, generatePassword, demoProfile };
 })();

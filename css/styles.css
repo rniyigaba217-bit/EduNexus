@@ -408,3 +408,95 @@ textarea.answer-box:focus { border-color:var(--accent); }
 
 .page       { display:none; }
 .page.active{ display:block; animation:fadeIn .3s ease; }
+
+/* ══════════════════════════════════════════════════
+   RESPONSIVE — MOBILE / PWA
+══════════════════════════════════════════════════ */
+
+/* Sidebar slide transition (always on, used by mobile toggle) */
+.sidebar { transition:transform .25s cubic-bezier(.4,0,.2,1); }
+
+/* Full-screen overlay when sidebar is open on mobile */
+.sidebar-overlay {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,.55); z-index:99;
+}
+.sidebar-overlay.open { display:block; }
+
+/* Hamburger (hidden on desktop, shown on mobile) */
+.hamburger {
+  display:none; background:none; border:none; color:var(--text);
+  font-size:1.4rem; cursor:pointer; padding:4px 6px; line-height:1;
+  border-radius:6px; transition:.15s;
+}
+.hamburger:hover { background:var(--bg3); }
+
+/* ── Mobile ≤ 768px ──────────────────────────── */
+@media (max-width:768px) {
+
+  /* Show hamburger, hide role label in topbar */
+  .hamburger { display:block; }
+  #topbar-role-label { display:none; }
+
+  /* Sidebar hidden off-screen; shown via .open */
+  .sidebar {
+    transform:translateX(-100%);
+    position:fixed; z-index:100;
+    box-shadow:var(--shadow);
+  }
+  .sidebar.open { transform:translateX(0); }
+
+  /* Main: no left margin, full width */
+  .main { margin-left:0; }
+
+  /* Topbar: tighter, wrap if needed */
+  .topbar { padding:10px 14px; flex-wrap:wrap; gap:6px; }
+  .topbar h2 { font-size:1rem; }
+
+  /* Content: smaller padding */
+  .content { padding:14px 12px; }
+
+  /* Login: full-width card */
+  .login-box { width:100%; padding:32px 20px; border-radius:14px; margin:16px; }
+
+  /* Two-column → single column */
+  .grid-2 { grid-template-columns:1fr !important; }
+  .grid-3 { grid-template-columns:1fr !important; }
+
+  /* Stats grid: 2 columns on mobile, 1 on very small */
+  .stats-grid { grid-template-columns:repeat(2,1fr) !important; gap:10px; }
+
+  /* Tables: scroll horizontally inside their card */
+  .card { overflow-x:auto; }
+
+  /* Chat layout: sidebar on top, messages below */
+  .chat-layout {
+    grid-template-columns:1fr !important;
+    grid-template-rows:200px 1fr !important;
+    height:calc(100vh - 110px) !important;
+  }
+
+  /* Modal: wider, slide up from bottom on small screens */
+  .modal {
+    width:100% !important; max-width:100% !important;
+    border-radius:20px 20px 0 0; margin:auto 0 0 0;
+    max-height:88vh;
+  }
+  .modal-overlay { align-items:flex-end !important; }
+
+  /* Notification panel: full width */
+  .notif-panel { right:8px; left:8px; width:auto; }
+
+  /* DM two-panel: stack vertically */
+  #dm-wrap { flex-direction:column !important; }
+  #dm-conv-list { width:100% !important; max-height:200px; border-right:none !important; border-bottom:1px solid var(--border); }
+  #dm-thread { min-height:300px; }
+}
+
+/* ── Very small ≤ 480px ──────────────────────── */
+@media (max-width:480px) {
+  .stats-grid { grid-template-columns:1fr !important; }
+  .content { padding:10px 8px; }
+  .topbar { padding:8px 10px; }
+  .card { padding:14px 12px; }
+}

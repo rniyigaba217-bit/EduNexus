@@ -19,8 +19,26 @@ const Nav = (() => {
   function setActive(page) {
     document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
     const el = document.getElementById('nav-' + page);
-    if (el) el.classList.add('active');
+    if (el) {
+      el.classList.add('active');
+      el.scrollIntoView({ block:'nearest', behavior:'smooth' });
+    }
+    if (window.innerWidth <= 768) closeSidebar();
   }
 
-  return { build, setActive };
+  function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    const opening = !sidebar.classList.contains('open');
+    sidebar.classList.toggle('open', opening);
+    if (overlay) overlay.classList.toggle('open', opening);
+  }
+
+  function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    const overlay = document.getElementById('sidebar-overlay');
+    if (overlay) overlay.classList.remove('open');
+  }
+
+  return { build, setActive, toggleSidebar, closeSidebar };
 })();

@@ -14,6 +14,17 @@ const App = (() => {
     'sd-departments':'Departments', 'sd-staff':'Staff & Facilitators',
     'sd-students':'Students', 'sd-reviews':'Reviews & Feedback',
     'sd-reports':'Performance Reports',
+    'attendance':'Attendance', 'stu-attendance':'My Attendance',
+    'fac-assignments':'Assignments', 'assignments':'Assignments',
+    'announcements':'Announcements',
+    'sys-log':'System Log',
+    'doc-requests':'Document Requests',
+    'stu-docs':'My Documents',
+    'analytics':'Operations Overview',
+    'timetable':'Timetable',
+    'notif-center':'Notification Centre',
+    'messages':'Messages',
+    'counseling':'Counseling & Wellbeing',
   };
 
   const views = {};
