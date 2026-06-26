@@ -14,8 +14,29 @@ function _ministryDash(c) {
   <div class="grid-2">
     <div class="card">
       <div class="card-title">🏫 Performance by University</div>
-      ${[['Univ. of Technology',88,'var(--green)'],['State Medical',85,'var(--green)'],['Natl. Engineering',82,'var(--blue)'],['Arts & Sciences',79,'var(--yellow)'],['Business School',77,'var(--yellow)'],['Southern Polytech.',71,'var(--red)']].map(([n,v,col])=>`
-      <div style="margin-top:10px"><div style="display:flex;justify-content:space-between;font-size:.83rem;margin-bottom:4px"><span style="color:var(--text2)">${n}</span><span style="color:${col};font-weight:700">${v}%</span></div>${Utils.progressBar(v,col)}</div>`).join('')}
+      <div style="font-size:.77rem;color:var(--text2);margin-bottom:8px">Click a school to view full detail</div>
+      ${[
+        ['Univ. of Technology', 'uot', 88,'var(--green)'],
+        ['State Medical',       'smu', 85,'var(--green)'],
+        ['Natl. Engineering',   'neu', 82,'var(--blue)'],
+        ['Arts & Sciences',     'asu', 79,'var(--yellow)'],
+        ['Business School',     'bs',  77,'var(--yellow)'],
+        ['Southern Polytech.',  'sp',  71,'var(--red)'],
+      ].map(([n,id,v,col])=>`
+      <div style="margin-top:10px;cursor:pointer;padding:6px 8px;border-radius:8px;
+        border:1px solid transparent;transition:.15s"
+        onclick="App.navigate('school-analysis');setTimeout(()=>MinistrySchools.detail('${id}'),80)"
+        onmouseenter="this.style.background='rgba(108,99,255,.05)';this.style.borderColor='rgba(108,99,255,.2)'"
+        onmouseleave="this.style.background='';this.style.borderColor='transparent'">
+        <div style="display:flex;justify-content:space-between;font-size:.83rem;margin-bottom:4px">
+          <span style="color:var(--text2)">${n}</span>
+          <span style="display:flex;align-items:center;gap:6px">
+            <span style="color:${col};font-weight:700">${v}%</span>
+            <span style="font-size:.72rem;color:var(--accent)">→</span>
+          </span>
+        </div>
+        ${Utils.progressBar(v,col)}
+      </div>`).join('')}
     </div>
     <div class="card">
       <div class="card-title">📋 Quick Insights</div>
