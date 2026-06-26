@@ -1,8 +1,8 @@
-/* EduNexus Service Worker — v1
+/* EduNexus Service Worker — v2
    Cache-first for app shell; network-first fallback for everything else.
    Bump CACHE version to force a refresh after major updates. */
 
-const CACHE = 'edunexus-v1';
+const CACHE = 'edunexus-v2';
 
 const SHELL = [
   './',
